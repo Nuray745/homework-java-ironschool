@@ -53,4 +53,6 @@ public class CourseController {
     public double getTotalProfit() {
         return courseService.getTotalMoneyEarned();
     }
+
+
 }
