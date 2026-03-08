@@ -36,4 +36,6 @@ public class CourseController {
                               @PathVariable String teacherId) {
         courseService.assignTeacher(courseId, teacherId);
     }
+
+
 }
