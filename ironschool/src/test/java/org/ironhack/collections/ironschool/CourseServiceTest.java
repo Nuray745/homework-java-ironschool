@@ -1,61 +1,70 @@
 package org.ironhack.collections.ironschool;
 
+package service;
+
+
 import org.ironhack.collections.ironschool.Model.Course;
-import org.ironhack.collections.ironschool.Model.Teacher;
 import org.ironhack.collections.ironschool.Service.CourseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class CourseServiceTest {
+class CourseServiceTest {
+
     private CourseService courseService;
-    private Course course1;
-    private Course course2;
+    private TeacherService teacherService;
 
     @BeforeEach
-    public void setUp() {
-        courseService = new CourseService();
-        course1 = new Course("Math", 100);
-        course2 = new Course("Physics", 200);
-
-        courseService.addCourse(course1);
-        courseService.addCourse(course2);
-    }
-    @Test
-    public void testEnrollStudent() {
-        assertEquals(0, course1.getMoneyEarned());
-        course1.enrollStudent();
-        assertEquals(100, course1.getMoneyEarned());
+    void setUp() {
+        teacherService = new TeacherService();
+        courseService = new CourseService(teacherService);
     }
 
     @Test
-    public void testAssignTeacher() {
-        Teacher t = new Teacher("Ali", 500);
-        assertNull(course1.getTeacher());
-        course1.assignTeacher(t);
-        assertEquals(t, course1.getTeacher());
-    }
-    @Test
-    public void testServiceEnrollStudent() {
-        assertEquals(0, course1.getMoneyEarned());
-        courseService.enrollStudent(course1.getCourseId());
-        assertEquals(100, course1.getMoneyEarned());
+    void createCourseShouldWork() {
+        Course course = courseService.createCourse("Java", 200);
+
+        assertEquals("Java", course.getName());
+        assertEquals(200, course.getPrice());
+        assertNotNull(course.getCourseId());
+        assertEquals(0, course.getMoneyEarned());
     }
 
     @Test
-    public void testServiceAssignTeacher() {
-        Teacher t = new Teacher("Aysha", 500);
-        assertNull(course2.getTeacher());
-        courseService.assignTeacher(course2.getCourseId(), t);
-        assertEquals(t, course2.getTeacher());
+    void assignTeacherShouldWork() {
+        Course course = courseService.createCourse("Java", 200);
+        Teacher teacher = teacherService.createTeacher("Ali", 3000);
+
+        courseService.assignTeacher(course.getCourseId(), teacher.getTeacherId());
+
+        assertEquals(teacher, course.getTeacher());
     }
 
     @Test
-    public void testGetTotalMoneyEarned() {
-        course1.enrollStudent();
-        course2.enrollStudent();
-        assertEquals(300, courseService.getTotalMoneyEarned());
+    void findCourseShouldReturnCourse() {
+        Course course = courseService.createCourse("Java", 200);
+
+        Course found = courseService.findCourse(course.getCourseId());
+
+        assertEquals(course, found);
+    }
+
+    @Test
+    void findCourseShouldReturnNullIfNotFound() {
+        Course found = courseService.findCourse("invalid-id");
+
+        assertNull(found);
+    }
+
+    @Test
+    void addCourseMoneyShouldIncreaseMoneyEarned() {
+        Course course = courseService.createCourse("C++", 400);
+
+        courseService.addCourseMoney(course.getCourseId());
+        assertEquals(400, course.getMoneyEarned());
+
+        courseService.addCourseMoney(course.getCourseId());
+        assertEquals(800, course.getMoneyEarned());
     }
 }
