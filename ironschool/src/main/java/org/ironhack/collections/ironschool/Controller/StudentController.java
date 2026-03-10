@@ -11,53 +11,70 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/students")
 public class StudentController {
-   private final StudentService studentService;
-   private final CourseService courseService;
-   public StudentController(StudentService studentService, CourseService courseService){
-       this.studentService=studentService;
-       this.courseService=courseService;
-   }
-   @GetMapping
-   public List<Student> displayAllStudents(){
-       List<Student> students=studentService.getAllStudent();
-       if(students==null || students.isEmpty()){
-           System.out.println("No students found in the system");
-       }
-       return students;
-   }
-   @GetMapping("/{id}")
-   public Student lookupStudent(@PathVariable String id){
-      try{
-         Student student=studentService.getStudentById(id);
-         if(student!=null){
-             return student;
-         }
-         else{
-             System.out.println("Student with ID " + id + " not found");
-             return null;
-         }
-      }
-      catch(Exception e){
-          System.out.println("Unexpected error happened: "+e.getMessage());
-          return null;
-       }
-   }
+    private final StudentService studentService;
+    private final CourseService courseService;
 
-   @PostMapping("/enroll")
-    public String enrollStudent(@RequestParam String id, @RequestParam String courseId) {
-       try {
-           String response = courseService.enrollStudent(courseId);
-           if (!response.equals("Course ID not found")) {
-               Student s = studentService.getStudentById(id);
-               if (s != null) {
-                   s.setCourse(courseService.getCourseById(courseId));
-               }
-               return "Success: " + s.getName() + " enrolled in " + courseId;
-           }
-           return response;
-       } catch (Exception e) {
-           return "Unexpected error happened " + e.getMessage();
-       }
-   }
+    public StudentController(StudentService studentService, CourseService courseService){
+        this.studentService = studentService;
+        this.courseService = courseService;
+    }
 
+    @GetMapping
+    public List<Student> displayAllStudents(){
+        List<Student> students = studentService.getAllStudent();
+        if(students == null || students.isEmpty()){
+            System.out.println("No students found in the system");
+        }
+        return students;
+    }
+
+    @GetMapping("/{id}")
+    public Student lookupStudent(@PathVariable String id){
+        Student student = studentService.getStudentById(id);
+        if(student != null) return student;
+        System.out.println("Student with ID " + id + " not found");
+        return null;
+    }
+
+
+    @PostMapping("/create")
+    public Student createStudent(@RequestBody Student student) {
+        return studentService.createStudent(student.getName(), student.getAddress(), student.getEmail());
+    }
+
+    @PostMapping("/enroll")
+    public String enrollStudent(@RequestParam String studentId,
+                                @RequestParam String courseId) {
+        Student student = studentService.getStudentById(studentId);
+        if(student == null) return "Student ID not found";
+
+        return courseService.enrollStudent(student, courseId);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteStudent(@PathVariable String id) {
+        Student student = studentService.getStudentById(id);
+        if (student != null) {
+            studentService.deleteStudent(id);
+            return "Student " + student.getName() + " deleted successfully";
+        }
+        return "Student ID not found";
+    }
+
+
+    @PutMapping("/{id}")
+    public Student updateStudent(@PathVariable String id, @RequestBody Student updatedStudent) {
+        return studentService.updateStudent(id,
+                updatedStudent.getName(),
+                updatedStudent.getAddress(),
+                updatedStudent.getEmail());
+    }
+
+    @PatchMapping("/{id}")
+    public Student patchStudent(@PathVariable String id, @RequestBody Student updatedFields) {
+        return studentService.patchStudent(id,
+                updatedFields.getName(),
+                updatedFields.getAddress(),
+                updatedFields.getEmail());
+    }
 }

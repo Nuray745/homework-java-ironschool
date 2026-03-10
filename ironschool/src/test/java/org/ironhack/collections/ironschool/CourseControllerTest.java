@@ -4,6 +4,7 @@ package org.ironhack.collections.ironschool;
 import org.ironhack.collections.ironschool.Controller.CourseController;
 import org.ironhack.collections.ironschool.Model.Course;
 import org.ironhack.collections.ironschool.Service.CourseService;
+import org.ironhack.collections.ironschool.Service.TeacherService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,8 @@ class CourseControllerTest {
     @BeforeEach
     void setup() {
         courseService = mock(CourseService.class);
-        courseController = new CourseController(courseService);
+        TeacherService teacherService = mock(TeacherService.class);
+        courseController = new CourseController(courseService, teacherService);
     }
 
     @Test

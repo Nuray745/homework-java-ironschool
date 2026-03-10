@@ -1,10 +1,11 @@
 package org.ironhack.collections.ironschool;
 
-package service;
 
 
 import org.ironhack.collections.ironschool.Model.Course;
+import org.ironhack.collections.ironschool.Model.Teacher;
 import org.ironhack.collections.ironschool.Service.CourseService;
+import org.ironhack.collections.ironschool.Service.TeacherService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
